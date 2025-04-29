@@ -1,90 +1,55 @@
 import pygame
-import random
+import sys
 
-# Initialize Pygame
+# --- Vulnerable Input: Paddle speed from command-line ---
+try:
+    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
+except (IndexError, ValueError):
+    paddle_speed = 5  # fallback default
+
+# --- Pygame Setup ---
 pygame.init()
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Vulnerable Ping Pong")
 
-# Screen dimensions
-screen_width = 800
-screen_height = 600
+# Game Elements
+ball = pygame.Rect(width // 2, height // 2, 15, 15)
+ball_speed = [4, 4]
+paddle = pygame.Rect(width - 20, height // 2 - 60, 10, 120)
 
-# Colors
-white = (255, 255, 255)
-black = (0, 0, 0)
+# Main Game Loop
+running = True
+clock = pygame.time.Clock()
 
-# Paddle dimensions
-paddle_width = 10
-paddle_height = 100
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-# Ball dimensions
-ball_size = 10
+    # Paddle Movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_UP] and paddle.top > 0:
+        paddle.y -= paddle_speed
+    if keys[pygame.K_DOWN] and paddle.bottom < height:
+        paddle.y += paddle_speed
 
-# Create the screen
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Pong')
+    # Ball Movement
+    ball.x += ball_speed[0]
+    ball.y += ball_speed[1]
 
-# Paddle class
-def draw_paddle(x, y):
-    pygame.draw.rect(screen, white, (x, y, paddle_width, paddle_height))
+    if ball.top <= 0 or ball.bottom >= height:
+        ball_speed[1] *= -1
+    if ball.left <= 0 or ball.right >= width:
+        ball_speed[0] *= -1
+    if ball.colliderect(paddle):
+        ball_speed[0] *= -1
 
-# Ball class
-def draw_ball(x, y):
-    pygame.draw.rect(screen, white, (x, y, ball_size, ball_size))
+    # Drawing
+    screen.fill((0, 0, 0))
+    pygame.draw.ellipse(screen, (255, 255, 255), ball)
+    pygame.draw.rect(screen, (255, 255, 255), paddle)
+    pygame.display.flip()
+    clock.tick(60)
 
-# Main game loop
-def game_loop():
-    # Paddle positions
-    paddle1_y = screen_height // 2 - paddle_height // 2
-    paddle2_y = screen_height // 2 - paddle_height // 2
-
-    # Ball position and speed
-    ball_x = screen_width // 2 - ball_size // 2
-    ball_y = screen_height // 2 - ball_size // 2
-    ball_speed_x = 3 * random.choice((1, -1))
-    ball_speed_y = 3 * random.choice((1, -1))
-
-    # Game loop
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        # Move the ball
-        ball_x += ball_speed_x
-        ball_y += ball_speed_y
-
-        # Ball collision with top and bottom
-        if ball_y <= 0 or ball_y >= screen_height - ball_size:
-            ball_speed_y *= -1
-
-        # Ball collision with paddles
-        if (ball_x <= paddle_width and paddle1_y < ball_y < paddle1_y + paddle_height) or \
-           (ball_x >= screen_width - paddle_width - ball_size and paddle2_y < ball_y < paddle2_y + paddle_height):
-            ball_speed_x *= -1
-
-        # Ball out of bounds
-        if ball_x < 0 or ball_x > screen_width:
-            ball_x = screen_width // 2 - ball_size // 2
-            ball_y = screen_height // 2 - ball_size // 2
-            ball_speed_x *= random.choice((1, -1))
-            ball_speed_y *= random.choice((1, -1))
-
-        # Fill the screen with black
-        screen.fill(black)
-
-        # Draw paddles and ball
-        draw_paddle(0, paddle1_y)
-        draw_paddle(screen_width - paddle_width, paddle2_y)
-        draw_ball(ball_x, ball_y)
-
-        # Update the display
-        pygame.display.flip()
-
-        # Frame rate
-        pygame.time.Clock().tick(60)
-
-    pygame.quit()
-
-if __name__ == '__main__':
-    game_loop()
+pygame.quit()
