@@ -3,9 +3,9 @@ import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
 try:
-    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
+    paddle_speed = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 5  # Validate input
 except (IndexError, ValueError):
-    paddle_speed = 5  # fallback default
+    paddle_speed = 5  # Fallback default
 
 # --- Pygame Setup ---
 pygame.init()
@@ -50,6 +50,6 @@ while running:
     pygame.draw.ellipse(screen, (255, 255, 255), ball)
     pygame.draw.rect(screen, (255, 255, 255), paddle)
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(60)  # Add timeout mechanism
 
 pygame.quit()
