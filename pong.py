@@ -3,9 +3,9 @@ import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
 try:
-    paddle_speed = int(sys.argv[1])  # Validate input to ensure it's a positive integer
-    if paddle_speed <= 0:
-        raise ValueError("Paddle speed must be a positive integer.")
+    paddle_speed = int(sys.argv[1])  # Validate input: Ensure it's a valid integer
+    if paddle_speed < 1 or paddle_speed > 10:
+        raise ValueError('Paddle speed must be between 1 and 10')
 except (IndexError, ValueError):
     paddle_speed = 5  # Fallback default
 
