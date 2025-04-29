@@ -3,9 +3,11 @@ import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
 try:
-    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
+    paddle_speed = int(sys.argv[1])  # Validate user input to ensure it is numeric
+    if paddle_speed <= 0:
+        raise ValueError("Paddle speed must be a positive integer.")
 except (IndexError, ValueError):
-    paddle_speed = 5  # fallback default
+    paddle_speed = 5  # Fallback default value
 
 # --- Pygame Setup ---
 pygame.init()
