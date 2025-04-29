@@ -2,10 +2,14 @@ import pygame
 import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
-try:
-    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
-except (IndexError, ValueError):
-    paddle_speed = 5  # fallback default
+def get_paddle_speed():
+    try:
+        paddle_speed = int(sys.argv[1])
+        if paddle_speed < 1 or paddle_speed > 10:
+            raise ValueError("Paddle speed must be between 1 and 10.")
+    except (IndexError, ValueError):
+        paddle_speed = 5  # Secure default value
+    return paddle_speed
 
 # --- Pygame Setup ---
 pygame.init()
@@ -30,9 +34,9 @@ while running:
     # Paddle Movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP] and paddle.top > 0:
-        paddle.y -= paddle_speed
+        paddle.y -= get_paddle_speed()
     if keys[pygame.K_DOWN] and paddle.bottom < height:
-        paddle.y += paddle_speed
+        paddle.y += get_paddle_speed()
 
     # Ball Movement
     ball.x += ball_speed[0]
