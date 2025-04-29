@@ -3,7 +3,11 @@ import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
 try:
-    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
+    user_input = sys.argv[1]
+    if user_input.isdigit():
+        paddle_speed = int(user_input)
+    else:
+        raise ValueError('Input must be a numeric value')
 except (IndexError, ValueError):
     paddle_speed = 5  # fallback default
 
