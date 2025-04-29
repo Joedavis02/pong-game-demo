@@ -3,7 +3,7 @@ import sys
 
 # --- Vulnerable Input: Paddle speed from command-line ---
 try:
-    paddle_speed = int(sys.argv[1])  # ⚠️ No validation: user can input very large or negative values
+    paddle_speed = int(sys.argv[1])  # 🛑 No validation: user can input very large or negative values
 except (IndexError, ValueError):
     paddle_speed = 5  # fallback default
 
